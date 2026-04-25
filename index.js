@@ -4,11 +4,9 @@ const app = express();
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 
-const PORT = 3000;
-
 app.use(express.json());
 
-// Swagger config
+/* ---------------- Swagger Config ---------------- */
 const options = {
   definition: {
     openapi: '3.0.0',
@@ -18,22 +16,28 @@ const options = {
       description: 'Simple API with Swagger',
     },
   },
-  apis: ['./index.js'], // IMPORTANT: same file
+
+  // 🔥 IMPORTANT FIX
+  apis: ["./index.js"]
 };
 
 const specs = swaggerJsdoc(options);
+console.log(JSON.stringify(specs, null, 2));
 
-// Swagger UI route
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+/* ---------------- Swagger UI ---------------- */
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(null, { swaggerOptions: { url: '/swagger.json' } }));
+app.get('/swagger.json', (req, res) => res.json(specs));
+
+/* ---------------- Routes ---------------- */
 
 /**
  * @swagger
  * /hi:
  *   get:
- *     summary: Home route
+ *     summary: Get Home
  *     responses:
  *       200:
- *         description: Success
+ *         description: OK
  */
 app.get('/hi', (req, res) => {
   res.send('Hello Backend 🚀');
@@ -43,33 +47,33 @@ app.get('/hi', (req, res) => {
  * @swagger
  * /about:
  *   get:
- *     summary: About page
+ *     summary: About Page
  *     responses:
  *       200:
- *         description: Success
+ *         description: OK
  */
 app.get('/about', (req, res) => {
-  res.send('This is About Page');
+  res.send('About Page');
 });
 
 /**
  * @swagger
  * /contact:
  *   get:
- *     summary: Contact page
+ *     summary: Contact Page
  *     responses:
  *       200:
- *         description: Success
+ *         description: OK
  */
 app.get('/contact', (req, res) => {
-  res.send('My name is Nirob');
+  res.send('Contact Page');
 });
 
 /**
  * @swagger
  * /user:
  *   post:
- *     summary: Create user
+ *     summary: Create User
  *     requestBody:
  *       required: true
  *       content:
@@ -83,18 +87,16 @@ app.get('/contact', (req, res) => {
  *                 type: number
  *     responses:
  *       200:
- *         description: User created successfully
+ *         description: User created
  */
 app.post('/user', (req, res) => {
-  const data = req.body;
-
   res.json({
     message: 'User received',
-    data: data,
+    data: req.body,
   });
 });
 
-// Server start (always last)
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+/* ---------------- Server ---------------- */
+app.listen(3000, () => {
+  console.log('Server running on http://localhost:3000');
 });
